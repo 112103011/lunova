@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lunova</title>
+  <script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #ffe4ec, #ffeaf6);
+      color: #4a4a4a;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #ffc1d6;
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      border-bottom: 5px solid #ffa3c2;
+    }
+    section {
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+    }
+    h2 {
+      color: #ff6fa4;
+      margin-top: 2rem;
+    }
+    .card {
+      background: #fff0f6;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(255, 182, 193, 0.3);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ffb6c1;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #ffa3c2;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #ff6fa4;
+    }
+    .result {
+      padding: 1rem;
+      background: #fff6fa;
+      border-left: 4px solid #ff99bb;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <header>Lunova</header>
+  <section>
+    <div class="card">
+  <h2>註冊</h2>
+  <label>暱稱（限英文與數字）</label>
+  <input id="reg-nickname" placeholder="ex: sunny123" pattern="[A-Za-z0-9]+" title="只能輸入英文與數字">
+  
+  <label>密碼</label>
+  <input id="reg-password" type="password" placeholder="密碼">
+  
+  <label>星座</label>
+  <select id="reg-zodiac">
+    <option value="">請選擇星座</option>
+    <option>白羊座</option>
+    <option>金牛座</option>
+    <option>雙子座</option>
+    <option>巨蟹座</option>
+    <option>獅子座</option>
+    <option>處女座</option>
+    <option>天秤座</option>
+    <option>天蠍座</option>
+    <option>射手座</option>
+    <option>摩羯座</option>
+    <option>水瓶座</option>
+    <option>雙魚座</option>
+  </select>
+  
+  <label>MBTI</label>
+  <select id="reg-mbti">
+    <option value="">請選擇 MBTI</option>
+    <option>INTJ</option><option>INTP</option><option>ENTJ</option><option>ENTP</option>
+    <option>INFJ</option><option>INFP</option><option>ENFJ</option><option>ENFP</option>
+    <option>ISTJ</option><option>ISFJ</option><option>ESTJ</option><option>ESFJ</option>
+    <option>ISTP</option><option>ISFP</option><option>ESTP</option><option>ESFP</option>
+  </select>
+  
+  <label>生日</label>
+  <input id="reg-birthday" type="date">
+  
+  <button onclick="register()">註冊</button>
+</div>
+
+
+    <div class="card">
+      <h2>登入</h2>
+      <input id="login-nickname" placeholder="暱稱">
+      <input id="login-password" type="password" placeholder="密碼">
+      <button onclick="login()">登入</button>
+    </div>
+
+    <div class="card">
+      <h2>今日運勢</h2>
+      <select id="zodiac-select">
+        <option value="">請選擇星座</option>
+        <option>白羊座</option>
+        <option>金牛座</option>
+        <option>雙子座</option>
+        <option>巨蟹座</option>
+        <option>獅子座</option>
+        <option>處女座</option>
+        <option>天秤座</option>
+        <option>天蠍座</option>
+        <option>射手座</option>
+        <option>摩羯座</option>
+        <option>水瓶座</option>
+        <option>雙魚座</option>
+      </select>
+      <button onclick="getFortune()">查詢運勢</button>
+      <div class="result" id="fortune-result"></div>
+    </div>
+
+    <div class="card">
+      <h2>推薦配對</h2>
+      <button onclick="getMatches()">查看推薦</button>
+      <div class="result" id="match-result"></div>
+    </div>
+  </section>
+
+  <script>
+    let token = '';
+
+    function register() {
+      const data = {
+        nickname: document.getElementById('reg-nickname').value,
+        password: document.getElementById('reg-password').value,
+        zodiac: document.getElementById('reg-zodiac').value,
+        mbti: document.getElementById('reg-mbti').value,
+        birthday: document.getElementById('reg-birthday').value
+      };
+      axios.post('https://your-api-url.com/api/register/', data)
+        .then(res => alert('註冊成功！'))
+        .catch(err => alert('註冊失敗！'));
+    }
+
+    function login() {
+      const data = {
+        nickname: document.getElementById('login-nickname').value,
+        password: document.getElementById('login-password').value
+      };
+      axios.post('https://your-api-url.com/api/login/', data)
+        .then(res => {
+          token = res.data.token;
+          alert('登入成功！');
+        })
+        .catch(err => alert('登入失敗！'));
+    }
+
+    function getFortune() {
+      const zodiac = document.getElementById('zodiac-select').value;
+      if (!zodiac) return alert('請先選擇星座');
+      axios.get(`https://your-api-url.com/api/fortune/?zodiac=${zodiac}`)
+        .then(res => {
+          document.getElementById('fortune-result').innerText = res.data.today;
+        })
+        .catch(err => alert('無法取得運勢'));
+    }
+
+    function getMatches() {
+      if (!token) return alert('請先登入');
+      axios.get('https://your-api-url.com/api/match/', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => {
+          document.getElementById('match-result').innerText = res.data.recommendations.join('\n');
+        })
+        .catch(err => alert('無法取得推薦配對'));
+    }
+  </script>
+</body>
+
+</html>
